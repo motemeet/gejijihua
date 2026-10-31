@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歌姬计划 | OFFICIAL WEBSITE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: ['class', '[data-theme="dark"]'],
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#141b2a',
+                        darkcard: '#1f293b',
+                        darktext: '#e2e8f0',
+                        lightbg: '#f4f6f8',
+                        lightcard: '#ffffff',
+                        lighttext: '#2a3140',
+                        accent: '#3b548a'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow-title {
+                text-shadow: 0 2px 20px rgba(0,0,0,0.6);
+            }
+            .bg-gradient-header {
+                background: linear-gradient(to bottom, rgba(20, 27, 42, 0.35), rgba(20, 27, 42, 0.92));
+            }
+            .scrollbar-hidden::-webkit-scrollbar {
+                display: none;
+            }
+            .scrollbar-hidden {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .animate-float {
+                animation: float 6s ease-in-out infinite;
+            }
+            .animate-fadein {
+                animation: fadeIn 1s ease forwards;
+            }
+            .animate-slidein-right {
+                animation: slideInRight 0.4s cubic-bezier(0.22,1,0.36,1);
+            }
+            .animate-slidein-left {
+                animation: slideInLeft 0.4s cubic-bezier(0.22,1,0.36,1);
+            }
+            .animate-fade-in-modal {
+                animation: fadeInModal 0.3s ease forwards;
+            }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-12px); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideInLeft {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeInModal {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        :root {
+            --bg: #141b2a;
+            --card: #1f293b;
+            --text: #e2e8f0;
+            --border: rgba(255,255,255,0.08);
+        }
+        [data-theme="light"] {
+            --bg: #f4f6f8;
+            --card: #ffffff;
+            --text: #2a3140;
+            --border: rgba(0,0,0,0.08);
+        }
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+
+        /* 全新干净开关样式 */
+        .theme-switch {
+            position: relative;
+            display: inline-flex;
+            width: 52px;
+            height: 28px;
+        }
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            inset:0;
+            background-color: #9ca3af;
+            border-radius: 999px;
+            transition: 0.3s;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left:3px;
+            bottom:3px;
+            background-color: white;
+            border-radius: 50%;
+            transition: 0.3s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        input:checked + .slider {
+            background-color: #22c55e;
+        }
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+    </style>
+</head>
+<body class="scrollbar-hidden">
+    <!-- 设置弹窗遮罩（右侧设置面板） -->
+    <div id="settingOverlay" class="fixed inset-0 bg-black/40 z-40 hidden transition-opacity duration-400"></div>
+    <div id="settingPanel" class="fixed top-0 right-0 h-full w-[min(420px,70%)] z-50 transform translate-x-full">
+        <div class="h-full p-8 flex flex-col" style="background: var(--card); border-left:1px solid var(--border);">
+            <div class="flex justify-between items-center mb-10">
+                <h3 class="text-xl font-semibold">DISPLAY SETTING</h3>
+                <button id="closeSetting" class="p-2 rounded-lg hover:bg-white/10 transition-all">
+                    <i class="fa fa-times text-lg"></i>
+                </button>
+            </div>
+            <div class="flex-1">
+                <div class="py-4 border-b flex items-center gap-3" style="border-color: var(--border)">
+                    <p>深色模式</p>
+                    <!-- 新版好看的开关 -->
+                    <label class="theme-switch">
+                        <input type="checkbox" id="themeToggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 左上角菜单按钮 -->
+    <div class="fixed top-6 left-6 z-30">
+        <button id="menuBtn" class="w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md transition-all hover:scale-110 hover:shadow-lg" style="background: var(--card); border:1px solid var(--border)">
+            <i class="fa fa-bars"></i>
+        </button>
+    </div>
+
+    <!-- 左侧弹出菜单半页面板 -->
+    <div id="menuOverlay" class="fixed inset-0 bg-black/50 z-[45] hidden"></div>
+    <div id="menuPanel" class="fixed top-0 left-0 h-full w-[min(360px,70%)] z-50 transform -translate-x-full">
+        <div class="h-full p-8 flex flex-col" style="background: var(--card); border-right:1px solid var(--border);">
+            <div class="flex justify-between items-center mb-10">
+                <h3 class="text-xl font-semibold">MENU</h3>
+                <button id="closeMenu" class="p-2 rounded-lg hover:bg-white/10 transition-all">
+                    <i class="fa fa-times text-lg"></i>
+                </button>
+            </div>
+            <div class="flex flex-col gap-4">
+                <button id="skinOverviewBtn" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/10 transition-all text-lg">皮肤总览</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右上角设置按钮 -->
+    <button id="openSetting" class="fixed top-6 right-6 z-30 w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md transition-all hover:scale-110 hover:shadow-lg" style="background: var(--card); border:1px solid var(--border)">
+        <i class="fa fa-cog"></i>
+    </button>
+
+    <!-- 皮肤总览弹窗遮罩 -->
+    <div id="skinModalOverlay" class="fixed inset-0 bg-black/60 z-[60] hidden flex items-center justify-center p-4">
+        <div id="skinModal" class="w-full max-w-4xl max-h-[85vh] overflow-y-auto rounded-xl animate-fade-in-modal" style="background: var(--card); border:1px solid var(--border)">
+            <div class="sticky top-0 px-6 py-4 flex justify-between items-center" style="background: var(--card); border-bottom:1px solid var(--border)">
+                <div>
+                    <p class="text-sm opacity-70">此网站正在测试 皮肤不全 请谅解</p>
+                </div>
+                <button id="closeSkinModal" class="p-2 rounded-lg hover:bg-white/10 transition-all">
+                    <i class="fa fa-times text-lg"></i>
+                </button>
+            </div>
+            <div class="p-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="rounded-lg overflow-hidden" style="border:1px solid var(--border)">
+                    <img src="GUMI-喵喵.png" alt="GUMI-喵喵" class="w-full h-52 object-cover">
+                    <div class="p-4">
+                        <h4 class="font-bold mb-2">GUMI-喵喵</h4>
+                        <p class="text-sm opacity-80">金色品质 抽奖获得 限定</p>
+                        <p class="text-sm opacity-80">专属标签：洛克王国联动</p>
+                    </div>
+                </div>
+                <div class="rounded-lg overflow-hidden" style="border:1px solid var(--border)">
+                    <img src="重音テト-火花.png" alt="重音テト-火花" class="w-full h-52 object-cover">
+                    <div class="p-4">
+                        <h4 class="font-bold mb-2">重音テト-火花</h4>
+                        <p class="text-sm opacity-80">金色品质 抽奖获得 限定</p>
+                        <p class="text-sm opacity-80">专属标签：洛克王国联动</p>
+                    </div>
+                </div>
+                <div class="rounded-lg overflow-hidden" style="border:1px solid var(--border)">
+                    <img src="GUMI-开学季.png" alt="GUMI-开学季" class="w-full h-52 object-cover">
+                    <div class="p-4">
+                        <h4 class="font-bold mb-2">GUMI-开学季</h4>
+                        <p class="text-sm opacity-80">粉色品质 活动获得 限定</p>
+                    </div>
+                </div>
+                <div class="rounded-lg overflow-hidden" style="border:1px solid var(--border)">
+                    <img src="初音未来-Happy Birthday 2026.png" alt="初音未来-Happy Birthday 2026" class="w-full h-52 object-cover">
+                    <div class="p-4">
+                        <h4 class="font-bold mb-2">初音未来-Happy Birthday 2026</h4>
+                        <p class="text-sm opacity-80">青色品质 抽奖获得 限定</p>
+                        <p class="text-sm opacity-80">专属标签：生日限定</p>
+                    </div>
+                </div>
+                <div class="rounded-lg overflow-hidden" style="border:1px solid var(--border)">
+                    <img src="初音未来-妄想感伤代偿联盟.png" alt="初音未来-妄想感伤代偿联盟" class="w-full h-52 object-cover">
+                    <div class="p-4">
+                        <h4 class="font-bold mb-2">初音未来-妄想感伤代偿联盟</h4>
+                        <p class="text-sm opacity-80">金色品质 抽奖获得 限定</p>
+                    </div>
+                </div>
+                <div class="rounded-lg overflow-hidden" style="border:1px solid var(--border)">
+                    <img src="洛天依-城中影光.png" alt="洛天依-城中影光" class="w-full h-52 object-cover">
+                    <div class="p-4">
+                        <h4 class="font-bold mb-2">洛天依-城中影光</h4>
+                        <p class="text-sm opacity-80">紫色品质 直售获得 888宇宙币 常驻</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 头部横幅区域 -->
+    <header class="relative h-screen flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://i.imgs.ovh/2026/10/24/47eed0dd60b6b5186769292cad649a25.webp')">
+        </div>
+        <div class="absolute inset-0 bg-gradient-header"></div>
+        <div class="relative z-10 text-center animate-fadein">
+            <h1 class="text-[clamp(3rem,8vw,7rem)] font-bold tracking-wider text-white text-shadow-title">歌姬计划</h1>
+            <p class="text-[clamp(1rem,2vw,1.8rem)] tracking-[0.4em] mt-4 text-white/80">OFFICIAL WEBSITE</p>
+        </div>
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-float">
+            <i class="fa fa-angle-down text-3xl text-white/70"></i>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-5 py-20">
+        <!-- ========== ACTIVITY 活动板块（双卡片） ========== -->
+        <section class="mb-28">
+            <h2 class="text-[clamp(1.8rem,3vw,2.5rem)] font-bold mb-8 tracking-wider">ACTIVITY</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- 活动卡片1 -->
+                <div class="rounded-xl overflow-hidden" style="background: var(--card); border:1px solid var(--border)">
+                    <img src="acty1.png" alt="S3秋日野餐活动图" class="w-full">
+                    <div class="p-6">
+                        <p class="text-lg">S3赛季“秋日野餐”开启！超多福利等你来！</p>
+                    </div>
+                </div>
+                <!-- 活动卡片2【新增】 -->
+                <div class="rounded-xl overflow-hidden" style="background: var(--card); border:1px solid var(--border)">
+                    <img src="acty2.png" alt="联动活动" class="w-full">
+                    <div class="p-6">
+                        <p class="text-lg">歌姬计划＆初音未来：缤纷舞台 正式联动！在“sekai”里漫游吧！</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-28">
+            <h2 class="text-[clamp(1.8rem,3vw,2.5rem)] font-bold mb-8 tracking-wider">ABOUT PROJECT</h2>
+            <div class="grid md:grid-cols-1 gap-8">
+                <div class="p-6 rounded-xl" style="background: var(--card); border:1px solid var(--border)">
+                    <p class="leading-relaxed">歌姬计划，XCgame出品游戏。2024年，歌姬们来到这个世界，“音乐之门”悄然开启。游戏中有刺激的战斗和灵动的音律，玩家可自行选择模式，尽情游玩。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-28">
+            <h2 class="text-[clamp(1.8rem,3vw,2.5rem)] font-bold mb-8 tracking-wider">NEWS</h2>
+            <div class="space-y-5">
+                <div class="p-5 rounded-xl flex flex-col md:flex-row gap-4 items-start" style="background: var(--card); border:1px solid var(--border)">
+                    <span class="text-sm opacity-70 min-w-[140px]">2024/12/05</span>
+                    <p>游戏《歌姬计划》上架内测</p>
+                </div>
+                <div class="p-5 rounded-xl flex flex-col md:flex-row gap-4 items-start" style="background: var(--card); border:1px solid var(--border)">
+                    <span class="text-sm opacity-70 min-w-[140px]">2025/9/9</span>
+                    <p>游戏《歌姬计划》上架公测</p>
+                </div>
+                <div class="p-5 rounded-xl flex flex-col md:flex-row gap-4 items-start" style="background: var(--card); border:1px solid var(--border)">
+                    <span class="text-sm opacity-70 min-w-[140px]">2026/6/28</span>
+                    <p>游戏《歌姬计划》下架</p>
+                </div>
+                <div class="p-5 rounded-xl flex flex-col md:flex-row gap-4 items-start" style="background: var(--card); border:1px solid var(--border)">
+                    <span class="text-sm opacity-70 min-w-[140px]">2026/8/6</span>
+                    <p>游戏《歌姬计划·N》上架内测，并开启官方频道</p>
+                </div>
+                <div class="p-5 rounded-xl flex flex-col md:flex-row gap-4 items-start" style="background: var(--card); border:1px solid var(--border)">
+                    <span class="text-sm opacity-70 min-w-[140px]">2026/10/4</span>
+                    <p>游戏《歌姬计划·N》重新改名为《歌姬计划》并公测</p>
+                </div>
+                <div class="p-5 rounded-xl flex flex-col md:flex-row gap-4 items-start" style="background: var(--card); border:1px solid var(--border)">
+                    <span class="text-sm opacity-70 min-w-[140px]">2026/10/24</span>
+                    <p>官方网站上线</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="py-10 text-center text-sm opacity-70" style="border-top:1px solid var(--border)">
+        <p>© 2026 XCgame All rights reserved.</p>
+    </footer>
+
+    <button id="pageTopBtn" class="fixed bottom-8 right-8 w-14 h-14 rounded-full flex items-center justify-center opacity-0 invisible transition-all duration-500 hover:scale-110 z-20" style="background: var(--card); border:1px solid var(--border)">
+        <i class="fa fa-arrow-up"></i>
+    </button>
+
+    <script>
+        const openSetting = document.getElementById('openSetting');
+        const settingOverlay = document.getElementById('settingOverlay');
+        const settingPanel = document.getElementById('settingPanel');
+        const closeSetting = document.getElementById('closeSetting');
+        const themeToggle = document.getElementById('themeToggle');
+        const pageTopBtn = document.getElementById('pageTopBtn');
+
+        function openPanel() {
+            settingOverlay.classList.remove('hidden');
+            settingPanel.classList.remove('translate-x-full');
+            settingPanel.classList.add('animate-slidein-right');
+        }
+        function closePanel() {
+            settingOverlay.classList.add('hidden');
+            settingPanel.classList.add('translate-x-full');
+            settingPanel.classList.remove('animate-slidein-right');
+        }
+        openSetting.addEventListener('click', openPanel);
+        closeSetting.addEventListener('click', closePanel);
+        settingOverlay.addEventListener('click', closePanel);
+
+        // 主题切换
+        themeToggle.addEventListener('change', () => {
+            if(themeToggle.checked){
+                document.documentElement.setAttribute('data-theme','dark');
+            }else{
+                document.documentElement.setAttribute('data-theme','light');
+            }
+        });
+
+        // 回到顶部
+        window.addEventListener('scroll', () => {
+            if(window.scrollY > 300) {
+                pageTopBtn.classList.remove('opacity-0','invisible');
+                pageTopBtn.classList.add('opacity-100','visible');
+            } else {
+                pageTopBtn.classList.add('opacity-0','invisible');
+                pageTopBtn.classList.remove('opacity-100','visible');
+            }
+        })
+        pageTopBtn.addEventListener('click', () => {
+            window.scrollTo({top: 0, behavior: 'smooth'})
+        })
+
+        // ==========左侧菜单面板逻辑==========
+        const menuBtn = document.getElementById('menuBtn');
+        const menuPanel = document.getElementById('menuPanel');
+        const menuOverlay = document.getElementById('menuOverlay');
+        const closeMenu = document.getElementById('closeMenu');
+        const skinOverviewBtn = document.getElementById('skinOverviewBtn');
+        const skinModalOverlay = document.getElementById('skinModalOverlay');
+        const closeSkinModal = document.getElementById('closeSkinModal');
+
+        function openMenu(){
+            menuOverlay.classList.remove('hidden');
+            menuPanel.classList.remove('-translate-x-full');
+            menuPanel.classList.add('animate-slidein-left');
+        }
+        function closeMenuPanel(){
+            menuOverlay.classList.add('hidden');
+            menuPanel.classList.add('-translate-x-full');
+            menuPanel.classList.remove('animate-slidein-left');
+        }
+
+        menuBtn.addEventListener('click', openMenu);
+        closeMenu.addEventListener('click', closeMenuPanel);
+        menuOverlay.addEventListener('click', closeMenuPanel);
+
+        // 打开皮肤弹窗，同时关闭左侧菜单
+        skinOverviewBtn.addEventListener('click', () => {
+            closeMenuPanel();
+            skinModalOverlay.classList.remove('hidden');
+        })
+
+        closeSkinModal.addEventListener('click', () => {
+            skinModalOverlay.classList.add('hidden');
+        })
+        skinModalOverlay.addEventListener('click', (e) => {
+            if(e.target === skinModalOverlay) {
+                skinModalOverlay.classList.add('hidden');
+            }
+        })
+    </script>
+</body>
+</html>
